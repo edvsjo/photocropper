@@ -12,7 +12,7 @@ def most_common_color(image):
     return color
 
 
-def find_bountries(image, color=255):
+def find_boundries(image, color=255):
     firstRow = 100000000
     firstCol = 100000000
     lastRow = -1
@@ -61,7 +61,7 @@ def crop_image(image, firstRow, lastRow, firstCol, lastCol):
 common_color = most_common_color(grey)
 print(common_color)
 
-firstRow, firstCol, lastRow, lastCol = find_bountries(grey, common_color)
+firstRow, firstCol, lastRow, lastCol = find_boundries(grey, common_color)
 
 print(firstRow, firstCol)
 print(lastRow, lastCol)
