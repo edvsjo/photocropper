@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-img = cv2.imread("images/Runfalcon_2.0_Sko_Svart_GZ7418_01_standard.jpg")
+img = cv2.imread("images/Adidas-VL-court-2_484630_60_extra7-kopi.jpg")
 
 grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -33,27 +33,47 @@ def find_boundries(image, color=255):
 def crop_image(image, firstRow, lastRow, firstCol, lastCol):
     cropHeight = 0
     cropWidth = 0
-
-    objectHeight = abs(lastRow - firstRow)
-    objectWidth =  abs(lastCol - firstCol)
-
-    if objectHeight > objectWidth:
-        cropHeight = objectHeight + 100
-        cropWidth = cropHeight * (1500/1814)
+    objectWidth = abs(firstCol - lastCol)
+    objectHeight = abs(firstRow - lastRow)
+    scalePercent = 0
+    if objectWidth >= objectHeight:
+        cropWidth = objectWidth + objectWidth*0.1
+        scalePercent = 1500 / (objectWidth +objectWidth*0.07)
     else:
-        cropWidth = objectWidth + 100
-        cropHeight = cropWidth * (1814/1500)
+        cropHeight = objectHeight + objectHeight*0.1
+        scalePercent = 1814 / (objectHeight + objectHeight*0.07)
     
-    objectCenterRow = (firstRow + lastRow)//2
-    objectCenterCol = (firstCol + lastCol)//2
+    width = int(image.shape[1] * scalePercent)
+    height = int(image.shape[0] * scalePercent)
+    resized = cv2.resize(image, (width, height), interpolation=cv2.INTER_AREA)
+    greyResized = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
+    rFirstRow, rFirstCol, rLastRow, rLastCol = find_boundries(greyResized, 237)
+    # image[firstRow] = 0
+    # image[lastRow] = 0
+    # image[:, firstCol] = 0
+    # image[:, lastCol] = 0
+    # resized[rFirstRow] = 0
+    # resized[rLastRow] = 0
+    # resized[:, rFirstCol] = 0
+    # resized[:, rLastCol] = 0
+    
+    # print(abs(firstRow- lastRow))
+    # print(abs(firstCol- lastCol))
+    # print(abs(rFirstRow- rLastRow))
+    # print(abs(rFirstCol- rLastCol))
+    # cv2.imshow("original", image)
+    # cv2.imshow("resized", resized)
+    # cv2.waitKey(0)
 
-    fromRow = objectCenterRow - (cropHeight//2)
-    toRow = objectCenterRow + (cropHeight//2)
-    fromCol = objectCenterCol - (cropWidth//2)
-    toCol = objectCenterCol + (cropWidth//2)
-    
-    print(fromRow, toRow, fromCol, toCol)
-    cropped = image[fromRow:toRow, fromCol:toCol]
+    objectCenterRow = int((rFirstRow + rLastRow)/2)
+    objectCenterCol = int((rFirstCol + rLastCol)/2)
+
+    fromCol = objectCenterCol - 750
+    toCol = objectCenterCol + 750
+    fromRow = objectCenterRow - 907
+    toRow = objectCenterRow + 907
+
+    cropped = resized[fromRow:toRow, fromCol:toCol]
     return cropped
 
 
@@ -63,19 +83,11 @@ print(common_color)
 
 firstRow, firstCol, lastRow, lastCol = find_boundries(grey, common_color)
 
-print(firstRow, firstCol)
-print(lastRow, lastCol)
 
-
-grey[firstRow] = 0
-grey[lastRow] = 0
-grey[:, firstCol] = 0
-grey[:, lastCol] = 0
-
-cropped = crop_image(grey, firstRow, lastRow, firstCol, lastCol)
-
-# cv2.imshow("testin", grey)
-# cv2.waitKey(0)
+cropped = crop_image(img, firstRow, lastRow, firstCol, lastCol)
+print(cropped.shape)
+cv2.imshow("cropped", cropped)
+cv2.waitKey(0)
 
 plt.imshow(grey, 'gray')
 plt.imshow(cropped, 'cropped')
