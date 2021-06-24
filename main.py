@@ -1,5 +1,5 @@
 from PIL import Image
-
+import os
 from cropper import crop
 from uniform_background import uniform_background_product_finder
 
@@ -14,6 +14,10 @@ def main(filename):
 
         cropped_image.show()
 
+def multiple(inputdir, outputdir):
+    for filename in os.listdir(inputdir):
+        if filename.endswith(".jpg") or filename.endswith(".png"):
+            main(inputdir + "/" + filename)
 
 if __name__ == '__main__':
-    main("images/Adidas-Daily-3_484621_60_extra6_unedited.jpg")
+    multiple("images/unedited_uniform_background", "bullshit")
