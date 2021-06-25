@@ -14,10 +14,18 @@ def main(filename):
 
         cropped_image.show()
 
-def multiple(inputdir, outputdir):
+        return cropped_image
+
+def multiple(inputdir, outputdir=None):
+    if outputdir is not None:
+        if not os.path.exists(outputdir): os.mkdir(outputdir)
+        
     for filename in os.listdir(inputdir):
         if filename.endswith(".jpg") or filename.endswith(".png"):
-            main(inputdir + "/" + filename)
+            image = main(inputdir + "/" + filename)
+            if outputdir is not None:
+                image.save(outputdir + "/" + filename)
+
 
 if __name__ == '__main__':
-    multiple("images/unedited_uniform_background", "bullshit")
+    multiple("images/unedited_uniform_background")
