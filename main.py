@@ -1,19 +1,17 @@
 from PIL import Image
 
-from cropper import crop
+from cropper import crop, draw_crop_rectangle
 from uniform_background import uniform_background_product_finder
 
 
 def main(filename):
     with Image.open(filename) as img:
-
         # TODO: The same cropping function `crop` can be used with other
         # "product finders". Here uses just the product finder for a simple
         # uniform white background.
-        cropped_image = crop(img, uniform_background_product_finder)
-
-        cropped_image.show()
+        drawn_crop_rectangle = draw_crop_rectangle(img, uniform_background_product_finder)
+        drawn_crop_rectangle.show()
 
 
 if __name__ == '__main__':
-    main("images/Adidas-Daily-3_484621_60_extra6_unedited.jpg")
+    main("images/unedited_uniform_background/Adidas-Advantage-Sneakers_484619_10_extra1.jpg")

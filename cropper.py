@@ -1,5 +1,5 @@
 from typing import Callable
-from PIL import Image
+from PIL import Image, ImageDraw
 
 ASPECT_RATIO = 0.82690187431  # 1500 / 1814
 WIDTH_PADDING = 100  # How much extra width to add to each side of the cropped image
@@ -29,6 +29,19 @@ class Rectangle:
     def center(self):
         return ((self.right + self.left) / 2, (self.lower + self.upper) / 2)
 
+    def draw(self, image: Image):
+        """Draw the rectangle on a image"""
+        draw = ImageDraw.Draw(image)
+        draw.line([
+            (self.left, self.upper),
+            (self.right, self.upper),
+            (self.right, self.lower),
+            (self.left, self.lower),
+            (self.left, self.upper)
+        ], width=3, fill=(0, 0, 0))
+
+        return image
+
 
 def crop(image: Image, product_finder: Callable[[Image], Rectangle]):
     product: Rectangle = product_finder(image)
@@ -36,6 +49,12 @@ def crop(image: Image, product_finder: Callable[[Image], Rectangle]):
     cropped = _calculate_crop_rectangle(product)
 
     return image.crop((cropped.left, cropped.upper, cropped.right, cropped.lower))
+
+
+def draw_crop_rectangle(image: Image, product_finder: Callable[[Image], Rectangle]):
+    product: Rectangle = product_finder(image)
+    cropped = _calculate_crop_rectangle(product)
+    return cropped.draw(image)
 
 
 def _calculate_crop_rectangle(product: Rectangle) -> Rectangle:
