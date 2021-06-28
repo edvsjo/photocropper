@@ -1,8 +1,10 @@
-from typing import Callable
+from typing import Callable, Tuple
+from operator import sub
 from PIL import Image, ImageDraw
 
 ASPECT_RATIO = 0.82690187431  # 1500 / 1814
 WIDTH_PADDING = 100  # How much extra width to add to each side of the cropped image
+STRICT_ASPECT_RATIO = True  # Force the cropped image strictly to the aspect ratio
 
 
 class Rectangle:
@@ -42,22 +44,88 @@ class Rectangle:
 
         return image
 
+    def encloses(self, other_rectangle) -> bool:
+        """ Fully encloses the other rectangle """
+        return (
+            self.left < other_rectangle.left and
+            self.right > other_rectangle.right and
+            self.upper < other_rectangle.upper and
+            self.lower > other_rectangle.lower)
+
+    def intersection(self, other_rectangle):
+        return Rectangle(
+            max(self.left, other_rectangle.left),
+            max(self.upper, other_rectangle.upper),
+            min(self.right, other_rectangle.right),
+            min(self.lower, other_rectangle.lower))
+
+    def pad_to_fill(self, image: Image, pad_color=(255, 255, 255)):
+        """Pad the image until it fills the rectangle. Position of the
+        original image will be relative to the rectangle: if the (left,
+        upper) of the rectangle is (-10, -15) the original image will
+        start at (10, 15) in the new image. The latter means the rectangle
+        will also act as a crop-rectangle, if the old image overflows to
+        its outsides.
+        """
+        new_image = Image.new(image.mode, (int(self.width()), int(self.height())), pad_color)
+        new_image.paste(image, (- int(self.left), - int(self.upper)))
+        return new_image
+
+    def move_to_align_with_corner(self, align_with, corner: Tuple[int, int]):
+        """ Corners: (-1, -1) = left upper, (-1, 1) = left lower,
+        (1, -1) = right upper, (1, 1) = right lower. A value of
+        0 means do not align in this direction; e.g. (-1, 0) is align
+        left without changing the location in the y-direction.
+        Keeps the width and height of the original rectangle. """
+        right = corner[0] == 1
+        left = corner[0] == -1
+        lower = corner[1] == 1
+        upper = corner[1] == -1
+
+        if right:
+            self.right = align_with.right
+            self.left = self.right - self.width()
+        elif left:
+            self.left = align_with.left
+            self.right = self.left + self.width()
+
+        if lower:
+            self.lower = align_with.lower
+            self.upper = self.lower - self.height()
+        elif upper:
+            self.upper = align_with.upper
+            self.lower = self.upper + self.height()
+
+        return self
+
+    def __str__(self):
+        return f"{self.left} {self.upper} {self.right} {self.lower}"
+
+    @staticmethod
+    def border(image: Image):
+        return Rectangle(0, 0, *image.size)
+
 
 def crop(image: Image, product_finder: Callable[[Image], Rectangle]):
     product: Rectangle = product_finder(image)
+    image_border = Rectangle.border(image)
+    cropped = _calculate_crop_rectangle(product, image_border)
 
-    cropped = _calculate_crop_rectangle(product)
-
-    return image.crop((cropped.left, cropped.upper, cropped.right, cropped.lower))
+    return cropped.pad_to_fill(image)
 
 
 def draw_crop_rectangle(image: Image, product_finder: Callable[[Image], Rectangle]):
     product: Rectangle = product_finder(image)
-    cropped = _calculate_crop_rectangle(product)
-    return cropped.draw(image)
+    image_border = Rectangle.border(image)
+    cropped = _calculate_crop_rectangle(product, image_border)
+
+    if image_border.encloses(cropped):
+        return cropped.draw(image)
+
+    return cropped.pad_to_fill(image)
 
 
-def _calculate_crop_rectangle(product: Rectangle) -> Rectangle:
+def _calculate_crop_rectangle(product: Rectangle, image_border: Rectangle) -> Rectangle:
     """Given the smallest rectangle containing the product, find the
     appropriate rectangle for cropping to, depending on the aspect
     ratio and padding.
@@ -71,4 +139,52 @@ def _calculate_crop_rectangle(product: Rectangle) -> Rectangle:
     right_cropped = left_cropped + width_cropped
     lower_cropped = upper_cropped + height_cropped
 
-    return Rectangle(left_cropped, upper_cropped, right_cropped, lower_cropped)
+    crop_rectangle = Rectangle(left_cropped, upper_cropped, right_cropped, lower_cropped)
+
+    if image_border.encloses(crop_rectangle):
+        return crop_rectangle
+
+    # When the crop rectangle goes outside the image, it is usually because
+    # the product is located at the edge of the image. Keep the aspect ratio,
+    # but move the crop rectangle so that its edges are aligned with the edges
+    # where the product goes outside the image.
+    product_corner = _alignement_corner_for_crop_overflow_fix(product, crop_rectangle, image_border)
+
+    return crop_rectangle.move_to_align_with_corner(product, product_corner)
+
+
+def _alignement_corner_for_crop_overflow_fix(product, crop_rectangle, image_border):
+    width_overflows = (crop_rectangle.left < image_border.left or
+                       crop_rectangle.right > image_border.right)
+    height_overflows = (crop_rectangle.upper < image_border.upper or
+                        crop_rectangle.lower > image_border.lower)
+
+    product_corner = _corner_with_product(product, image_border)
+
+    if not width_overflows:
+        product_corner = (0, product_corner[1])
+    if not height_overflows:
+        product_corner = (product_corner[0], 0)
+
+    return product_corner
+
+
+def _corner_with_product(product: Rectangle, image_border: Rectangle) -> Tuple[int, int]:
+    """ Corners: (-1, -1) = left upper, (-1, 1) = left lower,
+    (1, -1) = right upper, (1, 1) = right lower. A value of
+    0 means the product is centered in this direction. """
+    delta_x_product, delta_y_product = _tuple_subtract(product.center(),
+                                                       image_border.center())
+    return (_sign(delta_x_product), _sign(delta_y_product))
+
+
+def _tuple_subtract(tuple_1, tuple_2):
+    return tuple(map(sub, tuple_1, tuple_2))
+
+
+def _sign(x) -> int:
+    if x > 0:
+        return 1
+    if x < 0:
+        return -1
+    return 0
