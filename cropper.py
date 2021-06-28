@@ -51,13 +51,6 @@ class Rectangle:
             self.upper < other_rectangle.upper and
             self.lower > other_rectangle.lower)
 
-    def intersection(self, other_rectangle):
-        return Rectangle(
-            max(self.left, other_rectangle.left),
-            max(self.upper, other_rectangle.upper),
-            min(self.right, other_rectangle.right),
-            min(self.lower, other_rectangle.lower))
-
     def pad_to_fill(self, image: Image, pad_color=(255, 255, 255)):
         """Pad the image until it fills the rectangle. Position of the
         original image will be relative to the rectangle: if the (left,
