@@ -1,6 +1,6 @@
 from PIL import Image
 import os
-from cropper import crop, draw_crop_rectangle
+from cropper import crop
 from uniform_background import uniform_background_product_finder
 
 

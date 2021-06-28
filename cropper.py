@@ -4,7 +4,6 @@ from PIL import Image, ImageDraw
 
 ASPECT_RATIO = 0.82690187431  # 1500 / 1814
 WIDTH_PADDING = 100  # How much extra width to add to each side of the cropped image
-STRICT_ASPECT_RATIO = True  # Force the cropped image strictly to the aspect ratio
 
 
 class Rectangle:
@@ -110,17 +109,6 @@ def crop(image: Image, product_finder: Callable[[Image], Rectangle]):
     product: Rectangle = product_finder(image)
     image_border = Rectangle.border(image)
     cropped = _calculate_crop_rectangle(product, image_border)
-
-    return cropped.pad_to_fill(image)
-
-
-def draw_crop_rectangle(image: Image, product_finder: Callable[[Image], Rectangle]):
-    product: Rectangle = product_finder(image)
-    image_border = Rectangle.border(image)
-    cropped = _calculate_crop_rectangle(product, image_border)
-
-    if image_border.encloses(cropped):
-        return cropped.draw(image)
 
     return cropped.pad_to_fill(image)
 
