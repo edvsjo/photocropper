@@ -122,7 +122,7 @@ def _calculate_crop_rectangle(product: Rectangle, image_border: Rectangle) -> Re
     """
     width_cropped = max(product.width(), product.height() * ASPECT_RATIO) + WIDTH_PADDING
     height_cropped = width_cropped / ASPECT_RATIO
-    cropped_center_row, cropped_center_column = product.center()
+    cropped_center_column, cropped_center_row = product.center()
 
     left_cropped = cropped_center_column - width_cropped / 2
     upper_cropped = cropped_center_row - height_cropped / 2
