@@ -144,19 +144,38 @@ def _calculate_crop_rectangle(product: Rectangle, image_border: Rectangle) -> Re
 
 
 def _alignement_corner_for_crop_overflow_fix(product, crop_rectangle, image_border):
-    width_overflows = (crop_rectangle.left < image_border.left or
-                       crop_rectangle.right > image_border.right)
-    height_overflows = (crop_rectangle.upper < image_border.upper or
-                        crop_rectangle.lower > image_border.lower)
-
     product_corner = _corner_with_product(product, image_border)
 
-    if not width_overflows:
+    if not _left_right_align_edge(product, crop_rectangle, image_border):
         product_corner = (0, product_corner[1])
-    if not height_overflows:
+    if not _upper_lower_align_edge(product, crop_rectangle, image_border):
         product_corner = (product_corner[0], 0)
 
     return product_corner
+
+
+def _left_right_align_edge(product, crop_rectangle, image_border):
+    """ Should we align the left/right edge of the crop with the left/right
+    edge of the product? """
+    width_overflows = (crop_rectangle.left < image_border.left or
+                       crop_rectangle.right > image_border.right)
+
+    product_at_left_right_border = (product.left <= image_border.left or
+                                    product.right >= image_border.right)
+
+    return width_overflows and product_at_left_right_border
+
+
+def _upper_lower_align_edge(product, crop_rectangle, image_border):
+    """ Should we align the upper/lower edge of the crop with the upper/lower
+    edge of the product? """
+    height_overflows = (crop_rectangle.upper < image_border.upper or
+                        crop_rectangle.lower > image_border.lower)
+
+    product_at_upper_lower_border = (product.upper <= image_border.upper or
+                                     product.lower >= image_border.lower)
+
+    return height_overflows and product_at_upper_lower_border
 
 
 def _corner_with_product(product: Rectangle, image_border: Rectangle) -> Tuple[int, int]:
