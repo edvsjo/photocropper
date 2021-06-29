@@ -75,19 +75,22 @@ class Rectangle:
         lower = corner[1] == 1
         upper = corner[1] == -1
 
+        width = self.width()
+        height = self.height()
+
         if right:
             self.right = align_with.right
-            self.left = self.right - self.width()
+            self.left = self.right - width
         elif left:
             self.left = align_with.left
-            self.right = self.left + self.width()
+            self.right = self.left + width
 
         if lower:
             self.lower = align_with.lower
-            self.upper = self.lower - self.height()
+            self.upper = self.lower - height
         elif upper:
             self.upper = align_with.upper
-            self.lower = self.upper + self.height()
+            self.lower = self.upper + height
 
         return self
 

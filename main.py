@@ -10,7 +10,7 @@ def main(filename):
         # "product finders". Here uses just the product finder for a simple
         # uniform white background.
         cropped = crop(img, uniform_background_product_finder)
-        cropped = cropped.resize((1500, 1814), Image.BILINEAR)
+        cropped.save("images/temp.jpg")
         cropped.show()
         return cropped
 
@@ -30,4 +30,4 @@ def multiple(inputdir, outputdir=None):
 
 if __name__ == '__main__':
     # multiple("images/unedited_uniform_background")
-    main("images/unedited_uniform_background/Adidas-Advantage-Sneakers_484619_10_extra5.jpg")
+    main("images/unedited_uniform_background/Only-Carol-Dress_383296_65_extra4.jpg")
