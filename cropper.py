@@ -51,7 +51,7 @@ class Rectangle:
             self.upper < other_rectangle.upper and
             self.lower > other_rectangle.lower)
 
-    def pad_to_fill(self, image: Image, pad_color=(255, 255, 255)):
+    def pad_to_fill(self, image: Image):
         """Pad the image until it fills the rectangle. Position of the
         original image will be relative to the rectangle: if the (left,
         upper) of the rectangle is (-10, -15) the original image will
@@ -59,7 +59,8 @@ class Rectangle:
         will also act as a crop-rectangle, if the old image overflows to
         its outsides.
         """
-        new_image = Image.new(image.mode, (int(self.width()), int(self.height())), pad_color)
+        dominant_color = self.dominant_color_in_rect(image)
+        new_image = Image.new(image.mode, (int(self.width()), int(self.height())), dominant_color)
         new_image.paste(image, (- int(self.left), - int(self.upper)))
         return new_image
 
@@ -90,6 +91,12 @@ class Rectangle:
 
         return self
 
+    def dominant_color_in_rect(self, img: Image):
+        colors = img.getcolors(int(self.width() * self.height()))
+        sorted_colors = sorted(colors, key=lambda x: x[0])
+        dominant_color = sorted_colors[-1][1]
+        return dominant_color
+
     def __str__(self):
         return f"{self.left} {self.upper} {self.right} {self.lower}"
 
@@ -102,7 +109,6 @@ def crop(image: Image, product_finder: Callable[[Image], Rectangle]):
     product: Rectangle = product_finder(image)
     image_border = Rectangle.border(image)
     cropped = _calculate_crop_rectangle(product, image_border)
-
     return cropped.pad_to_fill(image)
 
 
