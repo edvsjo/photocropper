@@ -1,6 +1,6 @@
 from PIL import Image
 import os
-from cropper import crop, draw_crop_rectangle
+from cropper import crop
 from uniform_background import uniform_background_product_finder
 
 
@@ -9,15 +9,16 @@ def main(filename):
         # TODO: The same cropping function `crop` can be used with other
         # "product finders". Here uses just the product finder for a simple
         # uniform white background.
-        drawn_crop_rectangle = draw_crop_rectangle(img, uniform_background_product_finder)
-        drawn_crop_rectangle.show()
+        cropped = crop(img, uniform_background_product_finder)
+        cropped.show()
 
-        return cropped_image
+        return cropped
+
 
 def multiple(inputdir, outputdir=None):
     if outputdir is not None:
         if not os.path.exists(outputdir): os.mkdir(outputdir)
-        
+
     for filename in os.listdir(inputdir):
         if filename.endswith(".jpg") or filename.endswith(".png"):
             image = main(inputdir + "/" + filename)
