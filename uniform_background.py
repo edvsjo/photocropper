@@ -38,7 +38,7 @@ def _most_common_color(greyscale_image: np.ndarray):
 def _length_top_margin(greyscale_image: np.ndarray, background_color) -> int:
     """ How many rows at the top have solely the `background_color`? """
     def contains_other_than_background_color(row) -> bool:
-        return not _only_contains(background_color, row)
+        return not _nearly_only_contains(background_color, row)
 
     first_non_background_row = _index_of_first_occurence(
         contains_other_than_background_color, greyscale_image
@@ -71,8 +71,9 @@ def _index_of_first_occurence(condition, array) -> Optional[int]:
     return None
 
 
-def _only_contains(value, array) -> bool:
+def _nearly_only_contains(value, array) -> bool:
     for element in array:
-        if element != value:
+        # if element != value:
+        if not (element > value-20 and element < value+20):
             return False
     return True
