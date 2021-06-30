@@ -5,6 +5,7 @@ from PIL import Image
 
 from cropper import Rectangle
 
+ACCEPTABLE_NOISE_LEVEL = 20
 
 def uniform_background_product_finder(image: Image) -> Rectangle:
     """A product finder that assumes there is a uniform, single-colored
@@ -74,6 +75,6 @@ def _index_of_first_occurence(condition, array) -> Optional[int]:
 def _nearly_only_contains(value, array) -> bool:
     for element in array:
         # if element != value:
-        if not (element > value-20 and element < value+20):
+        if not (element > value-ACCEPTABLE_NOISE_LEVEL and element < value+ACCEPTABLE_NOISE_LEVEL):
             return False
     return True
