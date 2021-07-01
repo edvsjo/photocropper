@@ -32,4 +32,4 @@ def multiple(inputdir, outputdir=None):
 
 if __name__ == '__main__':
     # multiple("images/unedited_uniform_background")
-    main("images/unedited_uniform_background/Adidas-Advantage-Sneakers_484619_10_extra1.jpg")
+    main("images/unedited_uniform_background/Only-Carol-Dress_383296_65_extra2.jpg")
