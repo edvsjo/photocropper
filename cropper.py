@@ -7,6 +7,9 @@ import numpy as np
 ASPECT_RATIO = 0.82690187431  # 1500 / 1814
 WIDTH_PADDING = 100  # How much extra width to add to each side of the cropped image
 
+# The color used to locate what to inpaint. 
+# The color is also extremely rare in practice so it's unlikely to cause any issues. 
+MASK_COLOR = (0, 255, 0)
 
 class Rectangle:
     """A rectangle defined by its position and size."""
@@ -61,11 +64,9 @@ class Rectangle:
         will also act as a crop-rectangle, if the old image overflows to
         its outsides.
         """
-        dominant_color = self.dominant_color_in_rect(image)
-        # new_image = Image.new(image.mode, (int(self.width()), int(self.height())), dominant_color)
-        new_image = Image.new(image.mode, (int(self.width()), int(self.height())), (0, 255, 0))
+        new_image = Image.new(image.mode, (int(self.width()), int(self.height())), MASK_COLOR)
         new_image.paste(image, (- int(self.left), - int(self.upper)))
-        mask = self.draw_mask(new_image)
+        mask = Rectangle.draw_mask(new_image)
 
         #Convert the image to cv format and perform the inpainting
         cv_image = cv2.cvtColor(np.array(new_image), cv2.COLOR_RGB2BGR)
@@ -75,10 +76,11 @@ class Rectangle:
         PIL_edited = Image.fromarray(cv2.cvtColor(np.array(edited), cv2.COLOR_BGR2RGB))
         return PIL_edited
 
-    def draw_mask(self, image: Image):
-        """Create a mask of what the pad_to_fill function filled in"""
+    @staticmethod
+    def draw_mask(image: Image):
+        """Create a mask of what the pad_to_fill function fills in"""
         np_image = np.array(image)
-        mask = (np_image[:, :, 0]==0) & (np_image[:, :, 1]==255) & (np_image[:, :, 2]==0)
+        mask = (np_image[:, :, 0]==MASK_COLOR[0]) & (np_image[:, :, 1]==MASK_COLOR[1]) & (np_image[:, :, 2]==MASK_COLOR[2])
         mask_image = (mask*255).astype(np.uint8)
         return mask_image
 
