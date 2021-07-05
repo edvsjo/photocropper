@@ -22,14 +22,14 @@ def multiple(inputdir, outputdir=None):
         if not os.path.exists(outputdir): os.mkdir(outputdir)
 
     for filename in os.listdir(inputdir):
-        if filename.endswith(".jpg") or filename.endswith(".png"):
+        if filename.endswith(".jpg") or filename.endswith(".png") or filename.endswith(".tif"):
             img = Image.open(inputdir + "/" + filename)
             cropped = crop(img, uniform_background_product_finder)
-            cropped.show()
+            resized = cropped.resize((1500, 1814), Image.BICUBIC)
             if outputdir is not None:
-                cropped.save(outputdir + "/" + filename)
+                resized.save(outputdir + "/" + filename)
 
 
 if __name__ == '__main__':
-    # multiple("images/unedited_uniform_background")
-    main("images/unedited_uniform_background/Only-Carol-Dress_383296_65_extra2.jpg")
+    multiple("/Users/sportmannimac/Documents/Bilder/Puma", "/Users/sportmannimac/Documents/Bilder/Puma/output")
+    # main("images/unedited_uniform_background/Only-Carol-Dress_383296_65_extra2.jpg")
