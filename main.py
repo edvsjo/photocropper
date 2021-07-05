@@ -12,7 +12,7 @@ def main(filename):
         cropped = crop(img, uniform_background_product_finder)
         print(cropped.size)
         resized = cropped.resize((1500, 1814), Image.BICUBIC)
-        resized.save("images/temp.jpg")
+        # resized.save("images/temp.jpg")
         resized.show()
         return resized
 
@@ -31,5 +31,5 @@ def multiple(inputdir, outputdir=None):
 
 
 if __name__ == '__main__':
-    multiple("/Users/sportmannimac/Documents/Bilder/Puma", "/Users/sportmannimac/Documents/Bilder/Puma/output")
-    # main("images/unedited_uniform_background/Only-Carol-Dress_383296_65_extra2.jpg")
+    # multiple("/Users/sportmannimac/Downloads/assets", "/Users/sportmannimac/Documents/Bilder/Blend/output")
+    main("/Users/sportmannimac/Documents/photocropper/images/unedited_uniform_background/Only-Carol-Dress_383296_65_extra1.jpg")
