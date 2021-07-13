@@ -1,20 +1,35 @@
-import React, {useState} from 'react';
-import runScript from "runCropper";
+import React from 'react';
+const electron = window.require('electron');
+const { shell } = window.require('electron');
+const remote = electron.remote;
+const { dialog } = remote;
 
-const SearchBar = () => {
-  const [folder, setFolder] = useState<string>('');
+type folderProps = {
+  buttonText: string;
+};
+
+function openDialog() {
+  dialog
+    .showOpenDialog({
+      title: 'Open Dialogue',
+      message: 'First Dialog',
+      properties: ['openDirectory'],
+    })
+    .then((result: { filePaths: string[] }) => {
+      console.log(result);
+      shell.openPath(result.filePaths[0]);
+      console.log(result.filePaths[0]);
+    });
+}
+
+const Folder = ({ buttonText }: folderProps) => {
   return (
     <>
-      <input
-        type="file"
-        value={folder}
-        placeholder={'Pick a folder'}
-        onChange={(e) => setFolder(e.target.value)}
-      />
-      <img src={folder} alt="testing picture"/>
-      <input type="button" value="Run Script!" onChange={(e) => runScript()}></input>
+      <button className="fileBtn" onClick={() => openDialog()}>
+        {buttonText ? buttonText : 'Choose a folder'}
+      </button>
     </>
   );
 };
 
-export default SearchBar;
+export default Folder;

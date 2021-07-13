@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import icon from '../assets/icon.svg';
 import './App.global.css';
-import SearchBar from './folder';
+import MainPage from './MainPage';
 
 const Hello = () => {
   return (
@@ -45,7 +45,7 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={SearchBar} />
+        <Route path="/" component={MainPage} />
         <Route path="/hello" component={Hello} />
       </Switch>
     </Router>

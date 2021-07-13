@@ -5,7 +5,7 @@ from PIL import Image
 
 from cropper import Rectangle
 
-ACCEPTABLE_NOISE_LEVEL = 20
+ACCEPTABLE_NOISE_LEVEL = 50
 
 def uniform_background_product_finder(image: Image) -> Rectangle:
     """A product finder that assumes there is a uniform, single-colored

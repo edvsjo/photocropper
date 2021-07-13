@@ -1,5 +1,6 @@
 from PIL import Image
 import os
+import sys
 from cropper import crop
 from uniform_background import uniform_background_product_finder
 
@@ -31,5 +32,10 @@ def multiple(inputdir, outputdir=None):
 
 
 if __name__ == '__main__':
-    # multiple("/Users/sportmannimac/Downloads/assets", "/Users/sportmannimac/Documents/Bilder/Blend/output")
-    main("/Users/sportmannimac/Documents/photocropper/images/unedited_uniform_background/Only-Carol-Dress_383296_65_extra1.jpg")
+    if len(sys.argv) == 1:
+        multiple("/Users/sportmannimac/Downloads", "/Users/sportmannimac/Downloads/output")
+    elif len(sys.argv) == 2:
+        main(sys.argv[1])
+    else:
+        multiple(sys.argv[1], sys.argv[2])
+
