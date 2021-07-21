@@ -9,7 +9,7 @@ WIDTH_PADDING = 70  # How much extra width to add to each side of the cropped im
 
 # The color used to locate what to inpaint. 
 # The color is also extremely rare in practice so it's unlikely to cause any issues. 
-MASK_COLOR = (0, 255, 255)
+MASK_COLOR = (252, 252, 252)
 
 class Rectangle:
     """A rectangle defined by its position and size."""
@@ -65,13 +65,13 @@ class Rectangle:
         its outsides.
         """
         DominantColor = self.dominant_color_in_rect(image)
-        new_image = Image.new(image.mode, (int(self.width()), int(self.height())), MASK_COLOR)
+        new_image = Image.new('RGBA', (int(self.width()), int(self.height())), MASK_COLOR)
         new_image.paste(image, (- int(self.left), - int(self.upper)))
         mask = Rectangle.draw_mask(new_image, MASK_COLOR)
 
         #Convert the image to cv format and perform the inpainting
         cv_image = cv2.cvtColor(np.array(new_image), cv2.COLOR_RGB2BGR)
-        edited = cv2.inpaint(cv_image, mask, 5, cv2.INPAINT_TELEA)
+        edited = cv2.inpaint(cv_image, mask, 5, cv2.INPAINT_NS)
 
         #Convert back to PIL format
         PIL_edited = Image.fromarray(cv2.cvtColor(np.array(edited), cv2.COLOR_BGR2RGB))
