@@ -25,18 +25,19 @@ def multiple(inputdir, outputdir=None):
     for filename in os.listdir(inputdir):
         count += 1
         print(str(count) + "/" + str(amountFiles))
-        if filename.endswith(".jpg") or filename.endswith(".png") or filename.endswith(".JPG"):
+        if filename.endswith(".jpg") or filename.endswith(".png") or filename.endswith(".JPG") or filename.endswith(".Jpeg"):
             img = Image.open(inputdir + "/" + filename)
             cropped = crop(img, uniform_background_product_finder)
             # sRGB = convert_to_srgb(cropped)
             resized = cropped.resize((1500, 1814), Image.BICUBIC)
             if outputdir is not None:
                 resized.save(outputdir + "/" + filename)
+                print(filename)
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        multiple("/Users/sportmannimac/Downloads", "/Users/sportmannimac/Documents/Bilder/Puma/output")
+        multiple("/Users/sportmannimac/Downloads", "/Users/sportmannimac/Documents/Bilder/Kaffe/output")
     elif len(sys.argv) == 2:
         main(sys.argv[1])
     else:
