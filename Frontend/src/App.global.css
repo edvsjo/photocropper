@@ -8,7 +8,7 @@ body {
   height: 100vh;
   background: linear-gradient(
     200.96deg,
-    #fedc2a -29.09%,
+    #7a7a76 -29.09%,
     #dd5789 51.77%,
     #7a2c9e 129.35%
   );
@@ -59,6 +59,55 @@ a:hover {
   margin: 20px 0;
 }
 
-img {
-  width: 50px;
+.Main-Parrent {
+  display: flex;
+  flex-flow: row wrap;
+  align-content: center;
+  align-items: baseline;
+}
+
+.BtnGroup {
+  display: flex;
+  flex-flow: column nowrap;
+  padding: 30px;
+}
+
+.Btn {
+  height: 50%;
+  max-width: 25vw;
+}
+
+.ImagesContainer {
+  display: flex;
+  flex-direction: column wrap;
+  align-items: center;
+}
+
+.fileBtn {
+  max-width: 25vw;
+}
+
+.folderText {
+  max-width: 25vw;
+  overflow-wrap: break-word;
+}
+
+.image {
+  max-width: 40%;
+  padding: 5%;
+}
+
+.containerStyles {
+    height: 1rem;
+    width: 100%;
+    background-color: #e0e0de;
+    border-radius: 0.5rem/0.5rem;
+    margin: 50px;
+}
+
+.labelStyles {
+  padding: 5px;
+  color: white;
+  font-weight: bold;
+  margin-top: auto;
 }

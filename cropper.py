@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 ASPECT_RATIO = 0.82690187431  # 1500 / 1814
-WIDTH_PADDING = 70  # How much extra width to add to each side of the cropped image
+WIDTH_PADDING = 100  # How much extra width to add to each side of the cropped image
 
 # The color used to locate what to inpaint. 
 # The color is also extremely rare in practice so it's unlikely to cause any issues. 
@@ -67,6 +67,8 @@ class Rectangle:
         DominantColor = self.dominant_color_in_rect(image)
         new_image = Image.new('RGBA', (int(self.width()), int(self.height())), MASK_COLOR)
         new_image.paste(image, (- int(self.left), - int(self.upper)))
+        if len(image.info) != 0:
+            new_image.info = image.info
         mask = Rectangle.draw_mask(new_image, MASK_COLOR)
 
         #Convert the image to cv format and perform the inpainting

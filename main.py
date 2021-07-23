@@ -1,6 +1,7 @@
 from PIL import Image
 import os
 import sys
+import fnmatch
 from cropper import crop
 from uniform_background import uniform_background_product_finder
 
@@ -20,24 +21,32 @@ def main(filename):
 def multiple(inputdir, outputdir=None):
     if outputdir is not None:
         if not os.path.exists(outputdir): os.mkdir(outputdir)
-    amountFiles = len(os.listdir(inputdir))
+    
+    accepted_file_types = ('*.jpg', '*.jpeg', '*.gif', '*.png')
+    total=0
+    for root, dirs, files in os.walk(inputdir):
+        for extension in accepted_file_types:
+            for filename in fnmatch.filter(files, extension):
+                total+=1
+
     count = 0
-    for filename in os.listdir(inputdir):
-        count += 1
-        print(str(count) + "/" + str(amountFiles))
-        if filename.endswith(".jpg") or filename.endswith(".png") or filename.endswith(".JPG") or filename.endswith(".Jpeg"):
-            img = Image.open(inputdir + "/" + filename)
-            cropped = crop(img, uniform_background_product_finder)
-            # sRGB = convert_to_srgb(cropped)
-            resized = cropped.resize((1500, 1814), Image.BICUBIC)
-            if outputdir is not None:
-                resized.save(outputdir + "/" + filename)
-                print(filename)
+    for root, dirs, files in os.walk(inputdir):
+        for extension in accepted_file_types:
+            for filename in fnmatch.filter(files, extension):
+                count += 1
+                print(str(count) + "/" + str(total))
+                img = Image.open(inputdir + "/" + filename)
+                cropped = crop(img, uniform_background_product_finder)
+                resized = cropped.resize((1500, 1814), Image.BICUBIC)
+                if outputdir is not None:
+                    icc = img.info.get('icc_profile')
+                    resized.save(outputdir + "/" + filename, "JPEG", icc_profile=icc)
+                    print(filename)
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        multiple("/Users/sportmannimac/Downloads", "/Users/sportmannimac/Documents/Bilder/Kaffe/output")
+        multiple("/Users/sportmannimac/Downloads", "/Users/sportmannimac/Documents/Bilder/Adidas/output")
     elif len(sys.argv) == 2:
         main(sys.argv[1])
     else:

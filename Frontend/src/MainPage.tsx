@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import Folder from './folder';
 import { Options, PythonShell } from 'python-shell';
+import Placeholder from '../assets/Placeholder.jpg';
+import ProgressBar from './progressbar';
 
 const electron = window.require('electron');
 const remote = electron.remote;
@@ -29,6 +31,27 @@ function runCropper(updateImage: Function, updateProgress: Function, path1: stri
   });
 }
 
+function renderImage(inputPath: string, filename: string) {
+  if (filename != '') {
+    return(
+      <img
+        className="image Correct"
+        src={inputPath + '/' + filename}
+        alt="Not started yet😇"
+      />
+    );
+  }
+  else {
+    return (
+      <img
+        className="image Placeholder"
+        src={Placeholder}
+        alt="Something very wrong happend 😭"
+      />
+    )
+  }
+};
+
 const MainPage = () => {
   const [inputPath, setInputPath] = useState<string>("");
   const [outputPath, setOutputPath] = useState<string>("");
@@ -36,18 +59,29 @@ const MainPage = () => {
   const [image, setImage] = useState<string>("");
   return (
     <div className="Main-Parrent">
-      <Folder buttonText="Input Folder" callback={setInputPath}></Folder>
-      <div>{inputPath}</div>
-      <Folder buttonText="Output Folder" callback={setOutputPath}></Folder>
-      <div>{outputPath}</div>
-      <button onClick={() => runCropper(setImage, setProgress, inputPath, outputPath)}>
+      <div className="BtnGroup Input">
+        <Folder buttonText="Input Folder" callback={setInputPath}></Folder>
+        <div className="folderText">
+          {inputPath ? inputPath : 'No folder selected 😞'}
+        </div>
+      </div>
+      <div className="BtnGroup Output">
+        <Folder buttonText="Output Folder" callback={setOutputPath}></Folder>
+        <div className="folderText">
+          {outputPath ? outputPath : 'No folder selected 😞'}
+        </div>
+      </div>
+      <button
+        className={"Btn"}
+        onClick={() => runCropper(setImage, setProgress, inputPath, outputPath)}
+      >
         {'Run Cropper 😁'}
       </button>
-      <div>
-        {'progress:' + progress}
+      <ProgressBar progress={progress}/>
+      <div className="imagesContainer">
+        {renderImage(inputPath, image)}
+        {renderImage(outputPath, image)}
       </div>
-      <img className="image" src={inputPath + '/' + image} alt="Not started yet😇" ></img>
-      <img className="image" src={outputPath + '/' + image} alt="Not started yet😇"></img>
     </div>
   );
 };

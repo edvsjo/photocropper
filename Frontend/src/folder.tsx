@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Image from './Image';
 const electron = window.require('electron');
 const remote = electron.remote;
 const { dialog } = remote;
@@ -29,7 +28,6 @@ const Folder = ({ buttonText, callback }: folderProps) => {
       <button className="fileBtn" onClick={() => openDialog()}>
         {buttonText ? buttonText : 'Choose a folder'}
       </button>
-      {/* <Image folder={folder}></Image> */}
     </>
   );
 };
