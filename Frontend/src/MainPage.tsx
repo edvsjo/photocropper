@@ -14,7 +14,7 @@ const rootPath = app.getAppPath()
 function runCropper(updateImage: Function, updateProgress: Function, path1: string, path2?: string) {
   let options: Options = {
     mode: 'text',
-    pythonOptions: ['-u'], // get print results in real-time
+    pythonOptions: ['-u'],
     scriptPath: rootPath,
     args: [path1, path2],
   };
@@ -74,6 +74,7 @@ const MainPage = () => {
       <button
         className={"Btn"}
         onClick={() => runCropper(setImage, setProgress, inputPath, outputPath)}
+        disabled={(inputPath != "") && (outputPath != "")}
       >
         {'Run Cropper 😁'}
       </button>

@@ -46,9 +46,8 @@ def multiple(inputdir, outputdir=None):
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        multiple("/Users/sportmannimac/Downloads", "/Users/sportmannimac/Documents/Bilder/Adidas/output")
+        multiple("/Users/sportmannimac/Downloads", "/Users/sportmannimac/Documents/Bilder/Levis/output")
     elif len(sys.argv) == 2:
         main(sys.argv[1])
     else:
         multiple(sys.argv[1], sys.argv[2])
-

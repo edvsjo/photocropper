@@ -169,7 +169,7 @@ def _calculate_crop_rectangle(product: Rectangle, image_border: Rectangle) -> Re
 
 def _alignement_corner_for_crop_overflow_fix(product, crop_rectangle, image_border):
     product_corner = _corner_with_product(product, image_border)
-
+    print(product_corner)
     if not _left_right_align_edge(product, crop_rectangle, image_border):
         product_corner = (0, product_corner[1])
     if not _upper_lower_align_edge(product, crop_rectangle, image_border):
