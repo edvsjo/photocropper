@@ -1,12 +1,12 @@
 import torch
 from PIL import Image
+from cropper import Rectangle
 
-model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-image1 = Image.open('/Users/sportmannimac/Documents/photocropper/images/unedited_noisy_background/Hummel-Leagacy-Tapered-Pants_483983_40_extra1.jpg')
-# image2 = Image.open('/Users/sportmannimac/Documents/photocropper/images/unedited_noisy_background/Hummel-Leagacy-Tapered-Pants_483983_40_extra2.jpg')
-# image3 = Image.open('/Users/sportmannimac/Documents/photocropper/images/unedited_noisy_background/Hummel-Leagacy-Tapered-Pants_483983_40_extra3.jpg')
-
-results = model([image1])
-
-results.show()
-print(results.pandas().xyxy[0])
+def person_detector(image: Image) -> Rectangle:
+    model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+    result = model(image)
+    left = int(result.pandas().xyxy[0].xmin)
+    right = int(result.pandas().xyxy[0].xmax)
+    top = int(result.pandas().xyxy[0].ymin)
+    bot = int(result.pandas().xyxy[0].ymax)
+    return Rectangle(left, top, right, bot)

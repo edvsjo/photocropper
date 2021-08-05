@@ -4,14 +4,16 @@ import sys
 import fnmatch
 from cropper import crop
 from uniform_background import uniform_background_product_finder
+from persondetect import person_detector
 
 def main(filename):
     with Image.open(filename) as img:
         # TODO: The same cropping function `crop` can be used with other
         # "product finders". Here uses just the product finder for a simple
         # uniform white background.
-        cropped = crop(img, uniform_background_product_finder)
-        print(cropped.size)
+
+        # cropped = crop(img, uniform_background_product_finder)
+        cropped = crop(img, person_detector)
         resized = cropped.resize((1500, 1814), Image.BICUBIC)
         # resized.save("images/temp.jpg")
         resized.show()
@@ -46,7 +48,8 @@ def multiple(inputdir, outputdir=None):
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        multiple("/Users/sportmannimac/Downloads", "/Users/sportmannimac/Documents/Bilder/Levis/output")
+        # multiple("/Users/sportmannimac/Downloads/input", "/Users/sportmannimac/Downloads/output")
+        main('/Users/sportmannimac/Downloads/input/Helly-Hansen-Activ-Fall-Parka_484869_29_extra1.jpg')
     elif len(sys.argv) == 2:
         main(sys.argv[1])
     else:
