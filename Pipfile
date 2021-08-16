@@ -22,6 +22,7 @@ scikit-image = "*"
 torch = "*"
 torchvision = "*"
 seaborn = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.9"

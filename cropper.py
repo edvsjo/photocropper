@@ -3,13 +3,14 @@ from operator import sub
 from PIL import Image, ImageDraw
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 ASPECT_RATIO = 0.82690187431  # 1500 / 1814
-WIDTH_PADDING = 100  # How much extra width to add to each side of the cropped image
+WIDTH_PADDING = 30  # How much extra width to add to each side of the cropped image
 
 # The color used to locate what to inpaint. 
 # The color is also extremely rare in practice so it's unlikely to cause any issues. 
-MASK_COLOR = (252, 252, 252)
+MASK_COLOR = (219, 220, 220)
 
 class Rectangle:
     """A rectangle defined by its position and size."""
@@ -64,7 +65,7 @@ class Rectangle:
         will also act as a crop-rectangle, if the old image overflows to
         its outsides.
         """
-        DominantColor = self.dominant_color_in_rect(image)
+        # DominantColor = self.dominant_color_in_rect(image)
         new_image = Image.new('RGBA', (int(self.width()), int(self.height())), MASK_COLOR)
         new_image.paste(image, (- int(self.left), - int(self.upper)))
         if len(image.info) != 0:
@@ -136,6 +137,8 @@ def crop(image: Image, product_finder: Callable[[Image], Rectangle]):
     product: Rectangle = product_finder(image)
     image_border = Rectangle.border(image)
     cropped = _calculate_crop_rectangle(product, image_border)
+    # drawn = product.draw(image)
+    # drawn.show()
     return cropped.pad_to_fill(image)
 
 
@@ -158,6 +161,14 @@ def _calculate_crop_rectangle(product: Rectangle, image_border: Rectangle) -> Re
     if image_border.encloses(crop_rectangle):
         return crop_rectangle
 
+    # The values represent if the crop_rectangle 
+    # edges [horizontal, vertical] are bigger than the image itself.
+    # extending_edges = [crop_rectangle.width() > image_border.width(),
+    #                    crop_rectangle.height() > image_border.height()]
+    # if sum(extending_edges) == 1:
+    #     crop_rectangle = _extending_opposite_edges_fix(extending_edges, crop_rectangle, image_border)
+
+
     # When the crop rectangle goes outside the image, it is usually because
     # the product is located at the edge of the image. Keep the aspect ratio,
     # but move the crop rectangle so that its edges are aligned with the edges
@@ -166,10 +177,32 @@ def _calculate_crop_rectangle(product: Rectangle, image_border: Rectangle) -> Re
 
     return crop_rectangle.move_to_align_with_corner(product, product_corner)
 
+def _extending_opposite_edges_fix(extending_edges, crop_rectangle: Rectangle, image_border: Rectangle):
+    if extending_edges[0] and not extending_edges[1]:
+        #Make the product centered vertically and cut of someshit
+        new_crop_height = image_border.width() / ASPECT_RATIO
+
+        vertical_center = image_border.center()[1]
+        new_upper = vertical_center - new_crop_height/2
+        new_lower = vertical_center + new_crop_height/2
+        new_crop_rectangle = Rectangle(image_border.left, new_upper, image_border.right, new_lower)
+        return new_crop_rectangle
+
+    elif not extending_edges[0] and extending_edges[1]:
+        #Make the product centered horizontally and cut of someshit
+        new_crop_width = image_border.height() * ASPECT_RATIO
+
+        horizontal_center = image_border.center()[0]
+        new_left = horizontal_center - new_crop_width/2
+        new_right = horizontal_center + new_crop_width/2
+        new_crop_rectangle = Rectangle(new_left, image_border.upper, new_right, image_border.lower)
+        return new_crop_rectangle
+    
+    else:
+        return crop_rectangle
 
 def _alignement_corner_for_crop_overflow_fix(product, crop_rectangle, image_border):
     product_corner = _corner_with_product(product, image_border)
-    print(product_corner)
     if not _left_right_align_edge(product, crop_rectangle, image_border):
         product_corner = (0, product_corner[1])
     if not _upper_lower_align_edge(product, crop_rectangle, image_border):

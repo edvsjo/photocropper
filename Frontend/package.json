@@ -253,6 +253,7 @@
     "electron-updater": "^4.3.4",
     "fs": "^0.0.1-security",
     "history": "^5.0.0",
+    "multiselect-react-dropdown": "^2.0.5",
     "python-shell": "^3.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
